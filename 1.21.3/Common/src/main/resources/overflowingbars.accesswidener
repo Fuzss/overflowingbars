@@ -1,0 +1,13 @@
+accessWidener   v2  named
+accessible  field   net/minecraft/world/entity/ai/attributes/RangedAttribute    maxValue    D
+mutable field   net/minecraft/world/entity/ai/attributes/RangedAttribute    maxValue    D
+accessible  class   net/minecraft/client/gui/Gui$HeartType
+accessible  field   net/minecraft/client/gui/Gui$HeartType  full    Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/client/gui/Gui$HeartType  fullBlinking    Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/client/gui/Gui$HeartType  half    Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/client/gui/Gui$HeartType  halfBlinking    Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/client/gui/Gui$HeartType  hardcoreFull    Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/client/gui/Gui$HeartType  hardcoreFullBlinking    Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/client/gui/Gui$HeartType  hardcoreHalf    Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/client/gui/Gui$HeartType  hardcoreHalfBlinking    Lnet/minecraft/resources/ResourceLocation;
+accessible  method  net/minecraft/client/gui/Gui$HeartType  forPlayer   (Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/client/gui/Gui$HeartType;

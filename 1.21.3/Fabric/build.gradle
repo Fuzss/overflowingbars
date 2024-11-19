@@ -1,0 +1,18 @@
+apply from: "https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/${libs.versions.minecraft.get()}/fabric.gradle"
+
+dependencies {
+    // Fabric Api
+    modApi libs.fabricapi.fabric
+
+    // Puzzles Lib
+    modApi libs.puzzleslib.fabric
+
+    // Cloth Config
+    modLocalRuntime libs.cloth.fabric
+
+    // AppleSkin
+    modImplementation libs.appleskin.fabric
+
+    // Atlas Viewer
+//    modRuntimeOnly "curse.maven:atlasviewer-633577:5065464"
+}
