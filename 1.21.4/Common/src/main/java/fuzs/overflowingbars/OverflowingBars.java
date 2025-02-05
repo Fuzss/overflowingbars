@@ -24,7 +24,7 @@ public class OverflowingBars implements ModConstructor {
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment(MOD_ID)) return;
         ((RangedAttribute) Attributes.ARMOR.value()).maxValue = 1024.0;
         ((RangedAttribute) Attributes.ARMOR_TOUGHNESS.value()).maxValue = 1024.0;
     }
