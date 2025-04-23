@@ -1,6 +1,5 @@
 package fuzs.overflowingbars.client.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.overflowingbars.OverflowingBars;
 import fuzs.overflowingbars.config.ClientConfig;
 import net.minecraft.client.gui.GuiGraphics;
@@ -30,8 +29,6 @@ public class ArmorBarRenderer {
 
     public static void renderArmorBar(GuiGraphics guiGraphics, int posX, int posY, int vOffset, int armorPoints, boolean left, boolean unmodified, ClientConfig.AbstractArmorRowConfig config) {
         if (armorPoints <= 0) return;
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.defaultBlendFunc();
         boolean inverse = !unmodified && config.inverseColoring;
         boolean skip = !unmodified && config.skipEmptyArmorPoints;
         int lastRowArmorPoints = 0;
@@ -43,19 +40,73 @@ public class ArmorBarRenderer {
         for (int currentArmorPoint = 0; currentArmorPoint < 10; ++currentArmorPoint) {
             int startX = posX + (left ? currentArmorPoint * 8 : -currentArmorPoint * 8 - 9);
             if (currentArmorPoint * 2 + 1 < lastRowArmorPoints) {
-                guiGraphics.blit(RenderType::guiTextured, BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION, startX, posY, inverse ? 18 : 36, vOffset, 9, 9, 256, 256);
+                guiGraphics.blit(RenderType::guiTextured,
+                        BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
+                        startX,
+                        posY,
+                        inverse ? 18 : 36,
+                        vOffset,
+                        9,
+                        9,
+                        256,
+                        256);
             } else if (currentArmorPoint * 2 + 1 == lastRowArmorPoints) {
                 if (armorPoints > 20) {
-                    guiGraphics.blit(RenderType::guiTextured, BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION, startX, posY, inverse ? 54 : 27, vOffset, 9, 9, 256, 256);
+                    guiGraphics.blit(RenderType::guiTextured,
+                            BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
+                            startX,
+                            posY,
+                            inverse ? 54 : 27,
+                            vOffset,
+                            9,
+                            9,
+                            256,
+                            256);
                 } else {
-                    guiGraphics.blit(RenderType::guiTextured, BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION, startX, posY, inverse ? 9 : 45, vOffset, 9, 9, 256, 256);
+                    guiGraphics.blit(RenderType::guiTextured,
+                            BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
+                            startX,
+                            posY,
+                            inverse ? 9 : 45,
+                            vOffset,
+                            9,
+                            9,
+                            256,
+                            256);
                 }
             } else if (currentArmorPoint * 2 + 1 < armorPoints) {
-                guiGraphics.blit(RenderType::guiTextured, BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION, startX, posY, inverse ? 36 : 18, vOffset, 9, 9, 256, 256);
+                guiGraphics.blit(RenderType::guiTextured,
+                        BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
+                        startX,
+                        posY,
+                        inverse ? 36 : 18,
+                        vOffset,
+                        9,
+                        9,
+                        256,
+                        256);
             } else if (currentArmorPoint * 2 + 1 == armorPoints) {
-                guiGraphics.blit(RenderType::guiTextured, BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION, startX, posY, inverse ? 45 : 9, vOffset, 9, 9, 256, 256);
+                guiGraphics.blit(RenderType::guiTextured,
+                        BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
+                        startX,
+                        posY,
+                        inverse ? 45 : 9,
+                        vOffset,
+                        9,
+                        9,
+                        256,
+                        256);
             } else if (!skip && currentArmorPoint * 2 + 1 > armorPoints) {
-                guiGraphics.blit(RenderType::guiTextured, BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION, startX, posY, 0, vOffset, 9, 9, 256, 256);
+                guiGraphics.blit(RenderType::guiTextured,
+                        BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
+                        startX,
+                        posY,
+                        0,
+                        vOffset,
+                        9,
+                        9,
+                        256,
+                        256);
             }
         }
     }
