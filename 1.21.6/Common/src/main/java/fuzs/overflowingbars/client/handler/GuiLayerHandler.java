@@ -4,69 +4,76 @@ import fuzs.overflowingbars.OverflowingBars;
 import fuzs.overflowingbars.client.gui.BarOverlayRenderer;
 import fuzs.overflowingbars.client.helper.ChatOffsetHelper;
 import fuzs.overflowingbars.config.ClientConfig;
-import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
+import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
+import fuzs.puzzleslib.api.client.gui.v2.ScreenHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class GuiLayerHandler {
+    public static final ResourceLocation TOUGHNESS_LEVEL_LEFT_LOCATION = OverflowingBars.id("toughness_level/left");
+    public static final ResourceLocation TOUGHNESS_LEVEL_RIGHT_LOCATION = OverflowingBars.id("toughness_level/right");
+    public static final ResourceLocation TOUGHNESS_LEVEL_RIGHT_MOUNTED_LOCATION = OverflowingBars.id(
+            "toughness_level/right/mounted");
 
-    public static EventResult onRenderPlayerHealth(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static EventResult onRenderPlayerHealth(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         ClientConfig.IconRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).health;
-        if (!gui.minecraft.options.hideGui && gui.minecraft.getCameraEntity() instanceof Player &&
-                gui.minecraft.gameMode.canHurtPlayer() && config.allowLayers) {
-            int guiLeftHeight = GuiHeightHelper.getLeftHeight(gui) + config.manualRowShift();
-            BarOverlayRenderer.renderHealthLevelBars(gui.minecraft, guiGraphics, guiLeftHeight, config.allowCount);
-            GuiHeightHelper.addLeftHeight(gui,
-                    ChatOffsetHelper.twoHealthRows(gui.minecraft.player) ? 20 : 10 + config.manualRowShift());
+        Player player = getCameraPlayer();
+        if (config.allowLayers && player != null) {
+            int guiHeight = ScreenHelper.getLeftStatusBarHeight(GuiLayersContext.PLAYER_HEALTH);
+            guiHeight += config.manualRowShift();
+            BarOverlayRenderer.renderHealthLevelBars(guiGraphics, player, guiHeight, config.allowCount);
             return EventResult.INTERRUPT;
         } else {
             return EventResult.PASS;
         }
     }
 
-    public static EventResult onRenderArmorLevel(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static EventResult onRenderArmorLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         ClientConfig.AbstractArmorRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).armor;
-        if (!gui.minecraft.options.hideGui && gui.minecraft.getCameraEntity() instanceof Player &&
-                gui.minecraft.gameMode.canHurtPlayer() && config.allowLayers) {
-            int guiLeftHeight = GuiHeightHelper.getLeftHeight(gui) + config.manualRowShift();
-            BarOverlayRenderer.renderArmorLevelBar(gui.minecraft, guiGraphics, guiLeftHeight, config.allowCount, false);
-            if (ChatOffsetHelper.armorRow(gui.minecraft.player)) {
-                GuiHeightHelper.addLeftHeight(gui, 10 + config.manualRowShift());
-            }
+        Player player = getCameraPlayer();
+        if (config.allowLayers && player != null) {
+            int guiHeight = ScreenHelper.getLeftStatusBarHeight(GuiLayersContext.ARMOR_LEVEL);
+            guiHeight += config.manualRowShift();
+            BarOverlayRenderer.renderArmorLevelBar(guiGraphics, player, guiHeight, config.allowCount);
             return EventResult.INTERRUPT;
         } else {
             return EventResult.PASS;
         }
     }
 
-    public static void onRenderToughnessLevel(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static void onRenderToughnessLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker, ResourceLocation heightProviderLocation, boolean leftSide) {
         ClientConfig.ToughnessRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).toughness;
-        if (!gui.minecraft.options.hideGui && gui.minecraft.getCameraEntity() instanceof Player &&
-                gui.minecraft.gameMode.canHurtPlayer() && config.armorToughnessBar) {
+        Player player = getCameraPlayer();
+        if (config.leftSide == leftSide && config.armorToughnessBar && player != null) {
             int guiHeight;
-            if (config.leftSide) {
-                guiHeight = GuiHeightHelper.getLeftHeight(gui);
+            if (leftSide) {
+                guiHeight = ScreenHelper.getLeftStatusBarHeight(heightProviderLocation);
             } else {
-                guiHeight = GuiHeightHelper.getRightHeight(gui);
+                guiHeight = ScreenHelper.getRightStatusBarHeight(heightProviderLocation);
             }
             guiHeight += config.manualRowShift();
-            BarOverlayRenderer.renderToughnessLevelBar(gui.minecraft,
-                    guiGraphics,
+            BarOverlayRenderer.renderToughnessLevelBar(guiGraphics,
+                    player,
                     guiHeight,
                     config.allowCount,
-                    config.leftSide,
+                    leftSide,
                     !config.allowLayers);
-            if (ChatOffsetHelper.toughnessRow(gui.minecraft.player)) {
-                if (config.leftSide) {
-                    GuiHeightHelper.addLeftHeight(gui, 10 + config.manualRowShift());
-                } else {
-                    GuiHeightHelper.addRightHeight(gui, 10 + config.manualRowShift());
-                }
-            }
+        }
+    }
+
+    @Nullable
+    private static Player getCameraPlayer() {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!minecraft.options.hideGui && minecraft.gameMode.canHurtPlayer()) {
+            return minecraft.gui.getCameraPlayer();
+        } else {
+            return null;
         }
     }
 

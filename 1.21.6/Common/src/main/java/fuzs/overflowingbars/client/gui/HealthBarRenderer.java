@@ -6,11 +6,11 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.util.profiling.Profiler;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -30,11 +30,11 @@ public class HealthBarRenderer {
         this.tickCount++;
     }
 
-    public void renderPlayerHealth(GuiGraphics guiGraphics, int posX, int posY, Player player, ProfilerFiller profiler) {
-        profiler.push("health");
+    public void renderPlayerHealth(GuiGraphics guiGraphics, int posX, int posY, Player player) {
+        Profiler.get().push(OverflowingBars.id("health").toString());
         int currentHealth = Mth.ceil(player.getHealth());
-        boolean blink = this.healthBlinkTime > (long) this.tickCount &&
-                (this.healthBlinkTime - (long) this.tickCount) / 3L % 2L == 1L;
+        boolean blink = this.healthBlinkTime > (long) this.tickCount
+                && (this.healthBlinkTime - (long) this.tickCount) / 3L % 2L == 1L;
         long millis = Util.getMillis();
         if (currentHealth < this.lastHealth && player.invulnerableTime > 0) {
             this.lastHealthTime = millis;
@@ -69,7 +69,7 @@ public class HealthBarRenderer {
                 displayHealth,
                 currentAbsorption,
                 blink);
-        profiler.pop();
+        Profiler.get().pop();
     }
 
     private void renderHearts(GuiGraphics guiGraphics, Player player, int posX, int posY, int heartOffsetByRegen, float maxHealth, int currentHealth, int displayHealth, int currentAbsorptionHealth, boolean blink) {
@@ -91,8 +91,6 @@ public class HealthBarRenderer {
                 currentPosY -= 2;
             }
 
-            guiGraphics.pose().pushPose();
-
             // renders the black heart outline and background (only visible for half hearts)
             ModHeartType.CONTAINER.renderHeart(guiGraphics, currentPosX, currentPosY, blink, false, hardcore);
             // then the first call to renderHeart renders the heart from the layer below in case the current layer heart is just half a heart
@@ -102,8 +100,8 @@ public class HealthBarRenderer {
                 if (currentAbsorption < currentAbsorptionHealth) {
                     int maxAbsorptionHealth = maxAbsorptionHearts * 2;
                     boolean halfHeart = currentAbsorption + 1 == currentAbsorptionHealth % maxAbsorptionHealth;
-                    boolean orange = currentAbsorptionHealth > maxAbsorptionHealth &&
-                            currentAbsorption + 1 <= (currentAbsorptionHealth - 1) % maxAbsorptionHealth + 1;
+                    boolean orange = currentAbsorptionHealth > maxAbsorptionHealth
+                            && currentAbsorption + 1 <= (currentAbsorptionHealth - 1) % maxAbsorptionHealth + 1;
                     if (halfHeart && orange) {
                         ModHeartType.forPlayer(player, true, false)
                                 .renderHeart(guiGraphics, currentPosX, currentPosY, false, false, hardcore);
@@ -122,8 +120,8 @@ public class HealthBarRenderer {
                 }
                 ModHeartType heartType = ModHeartType.forPlayer(player,
                         false,
-                        orange || OverflowingBars.CONFIG.get(ClientConfig.class).health.colorizeFirstRow &&
-                                currentHeart * 2 + 1 <= (displayHealth - 1) % 20 + 1);
+                        orange || OverflowingBars.CONFIG.get(ClientConfig.class).health.colorizeFirstRow
+                                && currentHeart * 2 + 1 <= (displayHealth - 1) % 20 + 1);
                 heartType.renderHeart(guiGraphics, currentPosX, currentPosY, true, halfHeart, hardcore);
             }
 
@@ -136,12 +134,10 @@ public class HealthBarRenderer {
                 }
                 ModHeartType heartType = ModHeartType.forPlayer(player,
                         false,
-                        orange || OverflowingBars.CONFIG.get(ClientConfig.class).health.colorizeFirstRow &&
-                                currentHeart * 2 + 1 <= (currentHealth - 1) % 20 + 1);
+                        orange || OverflowingBars.CONFIG.get(ClientConfig.class).health.colorizeFirstRow
+                                && currentHeart * 2 + 1 <= (currentHealth - 1) % 20 + 1);
                 heartType.renderHeart(guiGraphics, currentPosX, currentPosY, false, halfHeart, hardcore);
             }
-
-            guiGraphics.pose().popPose();
         }
     }
 
@@ -181,13 +177,11 @@ public class HealthBarRenderer {
         }
 
         public void renderHeart(GuiGraphics guiGraphics, int posX, int posY, boolean blinking, boolean halfHeart, boolean hardcore) {
-            // same offset as font shadow to avoid issues with optimization mods batching drawn layers together
-            guiGraphics.pose().translate(0.0F, 0.0F, 0.03F);
             if (this.heartType != null) {
                 ResourceLocation resourceLocation = this.heartType.getSprite(hardcore, halfHeart, blinking);
-                guiGraphics.blitSprite(RenderType::guiTextured, resourceLocation, posX, posY, 9, 9);
+                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, resourceLocation, posX, posY, 9, 9);
             } else {
-                guiGraphics.blit(RenderType::guiTextured,
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                         this.textureSheet,
                         posX,
                         posY,

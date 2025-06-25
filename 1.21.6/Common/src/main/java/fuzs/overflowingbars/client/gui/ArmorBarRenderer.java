@@ -3,36 +3,36 @@ package fuzs.overflowingbars.client.gui;
 import fuzs.overflowingbars.OverflowingBars;
 import fuzs.overflowingbars.config.ClientConfig;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.util.Mth;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.util.profiling.Profiler;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 
 public class ArmorBarRenderer {
 
-    public static void renderArmorBar(GuiGraphics guiGraphics, int posX, int posY, Player player, ProfilerFiller profiler, boolean unmodified) {
-        profiler.push("armor");
+    public static void renderArmorBar(GuiGraphics guiGraphics, int posX, int posY, Player player) {
+        Profiler.get().push(OverflowingBars.id("armor").toString());
         ClientConfig.AbstractArmorRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).armor;
         int armorPoints = player.getArmorValue();
-        renderArmorBar(guiGraphics, posX, posY, 18, armorPoints, true, unmodified, config);
-        profiler.pop();
+        renderArmorBar(guiGraphics, posX, posY, 18, armorPoints, true, false, config);
+        Profiler.get().pop();
     }
 
-    public static void renderToughnessBar(GuiGraphics guiGraphics, int posX, int posY, Player player, ProfilerFiller profiler, boolean left, boolean unmodified) {
-        profiler.push("toughness");
+    public static void renderToughnessBar(GuiGraphics guiGraphics, int posX, int posY, Player player, boolean left, boolean vanillaLike) {
+        Profiler.get().push(OverflowingBars.id("toughness").toString());
         ClientConfig.ToughnessRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).toughness;
         int armorPoints = Mth.floor(player.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
-        renderArmorBar(guiGraphics, posX, posY, left ? 9 : 0, armorPoints, left, unmodified, config);
-        profiler.pop();
+        renderArmorBar(guiGraphics, posX, posY, left ? 9 : 0, armorPoints, left, vanillaLike, config);
+        Profiler.get().pop();
     }
 
-    public static void renderArmorBar(GuiGraphics guiGraphics, int posX, int posY, int vOffset, int armorPoints, boolean left, boolean unmodified, ClientConfig.AbstractArmorRowConfig config) {
+    public static void renderArmorBar(GuiGraphics guiGraphics, int posX, int posY, int vOffset, int armorPoints, boolean left, boolean vanillaLike, ClientConfig.AbstractArmorRowConfig config) {
         if (armorPoints <= 0) return;
-        boolean inverse = !unmodified && config.inverseColoring;
-        boolean skip = !unmodified && config.skipEmptyArmorPoints;
+        boolean inverse = !vanillaLike && config.inverseColoring;
+        boolean skip = !vanillaLike && config.skipEmptyArmorPoints;
         int lastRowArmorPoints = 0;
-        if (!unmodified) {
+        if (!vanillaLike) {
             if (config.colorizeFirstRow || armorPoints > 20) {
                 lastRowArmorPoints = (armorPoints - 1) % 20 + 1;
             }
@@ -40,7 +40,7 @@ public class ArmorBarRenderer {
         for (int currentArmorPoint = 0; currentArmorPoint < 10; ++currentArmorPoint) {
             int startX = posX + (left ? currentArmorPoint * 8 : -currentArmorPoint * 8 - 9);
             if (currentArmorPoint * 2 + 1 < lastRowArmorPoints) {
-                guiGraphics.blit(RenderType::guiTextured,
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                         BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
                         startX,
                         posY,
@@ -52,7 +52,7 @@ public class ArmorBarRenderer {
                         256);
             } else if (currentArmorPoint * 2 + 1 == lastRowArmorPoints) {
                 if (armorPoints > 20) {
-                    guiGraphics.blit(RenderType::guiTextured,
+                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                             BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
                             startX,
                             posY,
@@ -63,7 +63,7 @@ public class ArmorBarRenderer {
                             256,
                             256);
                 } else {
-                    guiGraphics.blit(RenderType::guiTextured,
+                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                             BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
                             startX,
                             posY,
@@ -75,7 +75,7 @@ public class ArmorBarRenderer {
                             256);
                 }
             } else if (currentArmorPoint * 2 + 1 < armorPoints) {
-                guiGraphics.blit(RenderType::guiTextured,
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                         BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
                         startX,
                         posY,
@@ -86,7 +86,7 @@ public class ArmorBarRenderer {
                         256,
                         256);
             } else if (currentArmorPoint * 2 + 1 == armorPoints) {
-                guiGraphics.blit(RenderType::guiTextured,
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                         BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
                         startX,
                         posY,
@@ -97,7 +97,7 @@ public class ArmorBarRenderer {
                         256,
                         256);
             } else if (!skip && currentArmorPoint * 2 + 1 > armorPoints) {
-                guiGraphics.blit(RenderType::guiTextured,
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                         BarOverlayRenderer.OVERFLOWING_ICONS_LOCATION,
                         startX,
                         posY,
