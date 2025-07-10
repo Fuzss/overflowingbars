@@ -6,7 +6,6 @@ import fuzs.overflowingbars.client.helper.ChatOffsetHelper;
 import fuzs.overflowingbars.config.ClientConfig;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
 import fuzs.puzzleslib.api.client.gui.v2.ScreenHelper;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -21,29 +20,23 @@ public class GuiLayerHandler {
     public static final ResourceLocation TOUGHNESS_LEVEL_RIGHT_MOUNTED_LOCATION = OverflowingBars.id(
             "toughness_level/right/mounted");
 
-    public static EventResult onRenderPlayerHealth(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        ClientConfig.IconRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).health;
+    public static void onRenderPlayerHealth(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         Player player = getCameraPlayer();
-        if (config.allowLayers && player != null) {
+        if (player != null) {
+            ClientConfig.IconRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).health;
             int guiHeight = ScreenHelper.getLeftStatusBarHeight(GuiLayersContext.PLAYER_HEALTH);
             guiHeight += config.manualRowShift();
             BarOverlayRenderer.renderHealthLevelBars(guiGraphics, player, guiHeight, config.allowCount);
-            return EventResult.INTERRUPT;
-        } else {
-            return EventResult.PASS;
         }
     }
 
-    public static EventResult onRenderArmorLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        ClientConfig.AbstractArmorRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).armor;
+    public static void onRenderArmorLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         Player player = getCameraPlayer();
-        if (config.allowLayers && player != null) {
+        if (player != null) {
+            ClientConfig.AbstractArmorRowConfig config = OverflowingBars.CONFIG.get(ClientConfig.class).armor;
             int guiHeight = ScreenHelper.getLeftStatusBarHeight(GuiLayersContext.ARMOR_LEVEL);
             guiHeight += config.manualRowShift();
             BarOverlayRenderer.renderArmorLevelBar(guiGraphics, player, guiHeight, config.allowCount);
-            return EventResult.INTERRUPT;
-        } else {
-            return EventResult.PASS;
         }
     }
 
@@ -63,7 +56,7 @@ public class GuiLayerHandler {
                     guiHeight,
                     config.allowCount,
                     leftSide,
-                    !config.allowLayers);
+                    !config.allowToughnessLayers);
         }
     }
 

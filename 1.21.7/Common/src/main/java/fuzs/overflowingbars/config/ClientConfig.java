@@ -5,8 +5,13 @@ import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import net.minecraft.ChatFormatting;
 
 public class ClientConfig implements ConfigCore {
+    /**
+     * Corresponding options are separate as not all require a game restart.
+     */
+    static final String ALLOW_LAYERS_DESCRIPTION = "Add layers to this bar. When disabled any modifications to the bar from this mod will be turned off.";
+
     @Config
-    public IconRowConfig health = new IconRowConfig();
+    public HealthRowConfig health = new HealthRowConfig();
     @Config
     public ArmorRowConfig armor = new ArmorRowConfig();
     @Config
@@ -15,8 +20,6 @@ public class ClientConfig implements ConfigCore {
     public RowCountConfig rowCount = new RowCountConfig();
 
     public static class IconRowConfig implements ConfigCore {
-        @Config(description = "Add layers to this bar. When disabled any modifications to the bar from this mod will be turned off.")
-        public boolean allowLayers = true;
         @Config(description = "Render row count to indicate total amount of rows since not all may be visible at once due to the stacked rendering.")
         public boolean allowCount = true;
         @Config(description = "Show colorful icons on the front row, not just on all subsequent rows.")
@@ -25,11 +28,18 @@ public class ClientConfig implements ConfigCore {
         public boolean inverseColoring = false;
         @Config(description = "Shift the bar up or down by specified number of icon rows. Allows for better mod compatibility.")
         @Config.IntRange(min = -5, max = 5)
-        public int manualRowShift = 0;
+        int manualRowShift = 0;
 
         public int manualRowShift() {
             return this.manualRowShift * 10;
         }
+    }
+
+    public static class HealthRowConfig extends IconRowConfig {
+        @Config(
+                description = ALLOW_LAYERS_DESCRIPTION, gameRestart = true
+        )
+        public boolean allowHealthLayers = true;
     }
 
     public static abstract class AbstractArmorRowConfig extends IconRowConfig {
@@ -38,11 +48,19 @@ public class ClientConfig implements ConfigCore {
     }
 
     public static class ArmorRowConfig extends AbstractArmorRowConfig {
+        @Config(
+                description = ALLOW_LAYERS_DESCRIPTION, gameRestart = true
+        )
+        public boolean allowArmorLayers = true;
         @Config(description = "Move chat messages above armor / absorption bar.")
         public boolean moveChatAboveArmor = true;
     }
 
     public static class ToughnessRowConfig extends AbstractArmorRowConfig {
+        @Config(
+                description = ALLOW_LAYERS_DESCRIPTION
+        )
+        public boolean allowToughnessLayers = true;
         @Config(
                 description = {
                         "Render a separate armor bar for the armor toughness attribute (from diamond and netherite armor).",

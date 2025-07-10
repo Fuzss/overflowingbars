@@ -29,31 +29,27 @@ public class OverflowingBarsClient implements ClientModConstructor {
 
     @Override
     public void onRegisterGuiLayers(GuiLayersContext context) {
-        context.replaceGuiLayer(GuiLayersContext.PLAYER_HEALTH, (GuiLayersContext.Layer layer) -> {
-            return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                if (GuiLayerHandler.onRenderPlayerHealth(guiGraphics, deltaTracker).isPass()) {
-                    layer.render(guiGraphics, deltaTracker);
+        if (OverflowingBars.CONFIG.get(ClientConfig.class).health.allowHealthLayers) {
+            context.replaceGuiLayer(GuiLayersContext.PLAYER_HEALTH, (GuiLayersContext.Layer layer) -> {
+                return GuiLayerHandler::onRenderPlayerHealth;
+            });
+            context.addLeftStatusBarHeightProvider(GuiLayersContext.PLAYER_HEALTH, (Player player) -> {
+                return (ChatOffsetHelper.twoHealthRows(player) ? 20 : 10)
+                        + OverflowingBars.CONFIG.get(ClientConfig.class).health.manualRowShift();
+            });
+        }
+        if (OverflowingBars.CONFIG.get(ClientConfig.class).armor.allowArmorLayers) {
+            context.replaceGuiLayer(GuiLayersContext.ARMOR_LEVEL, (GuiLayersContext.Layer layer) -> {
+                return GuiLayerHandler::onRenderArmorLevel;
+            });
+            context.addLeftStatusBarHeightProvider(GuiLayersContext.ARMOR_LEVEL, (Player player) -> {
+                if (ChatOffsetHelper.armorRow(player)) {
+                    return 10 + OverflowingBars.CONFIG.get(ClientConfig.class).armor.manualRowShift();
+                } else {
+                    return 0;
                 }
-            };
-        });
-        context.addLeftStatusBarHeightProvider(GuiLayersContext.PLAYER_HEALTH, (Player player) -> {
-            return ChatOffsetHelper.twoHealthRows(player) ? 20 :
-                    10 + OverflowingBars.CONFIG.get(ClientConfig.class).health.manualRowShift();
-        });
-        context.replaceGuiLayer(GuiLayersContext.ARMOR_LEVEL, (GuiLayersContext.Layer layer) -> {
-            return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                if (GuiLayerHandler.onRenderArmorLevel(guiGraphics, deltaTracker).isPass()) {
-                    layer.render(guiGraphics, deltaTracker);
-                }
-            };
-        });
-        context.addLeftStatusBarHeightProvider(GuiLayersContext.ARMOR_LEVEL, (Player player) -> {
-            if (ChatOffsetHelper.armorRow(player)) {
-                return 10 + OverflowingBars.CONFIG.get(ClientConfig.class).armor.manualRowShift();
-            } else {
-                return 0;
-            }
-        });
+            });
+        }
         context.registerGuiLayer(GuiLayersContext.ARMOR_LEVEL,
                 GuiLayerHandler.TOUGHNESS_LEVEL_LEFT_LOCATION,
                 (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
