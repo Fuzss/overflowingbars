@@ -5,5 +5,5 @@ dependencies {
     modApi libs.puzzleslib.neoforge
 
     // AppleSkin
-//    modRuntimeOnly libs.appleskin.neoforge
+    modRuntimeOnly libs.appleskin.neoforge
 }

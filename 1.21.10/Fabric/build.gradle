@@ -8,10 +8,10 @@ dependencies {
     modApi libs.puzzleslib.fabric
 
     // Cloth Config
-//    modLocalRuntime libs.cloth.fabric
+    modLocalRuntime libs.cloth.fabric
 
     // AppleSkin
-//    modImplementation libs.appleskin.fabric
+    modImplementation libs.appleskin.fabric
 
     // Atlas Viewer
 //    modRuntimeOnly "curse.maven:atlasviewer-633577:5065464"
